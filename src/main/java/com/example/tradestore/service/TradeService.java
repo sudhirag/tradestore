@@ -2,6 +2,8 @@ package com.example.tradestore.service;
 
 import com.example.tradestore.entity.Trade;
 import com.example.tradestore.repository.TradeRepository;
+import com.example.tradestore.service.exceptions.StaleTradeRecievedException;
+import com.example.tradestore.service.exceptions.TradeWithPastMaturityDateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,13 @@ public class TradeService {
         Integer maxVersion = tradeRepository.getMaxVersion(trade.getTradeId());
 
         if(maxVersion != null && trade.getVersion() < maxVersion) {
-            throw new RuntimeException("The version of trade received is less than the latest version available in store.");
+            throw new StaleTradeRecievedException("The version of trade received is less than the latest version available in store.");
         }
 
         LocalDate maturityDate = trade.getMaturityDate();
 
         if(maturityDate.isBefore(LocalDate.now())) {
-            throw new RuntimeException("The maturity date of the trade is in the past.");
+            throw new TradeWithPastMaturityDateException("The maturity date of the trade is in the past.");
         }
 
         return tradeRepository.save(trade);

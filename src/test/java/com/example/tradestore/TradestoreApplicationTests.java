@@ -2,6 +2,8 @@ package com.example.tradestore;
 
 import com.example.tradestore.entity.Trade;
 import com.example.tradestore.service.TradeService;
+import com.example.tradestore.service.exceptions.StaleTradeRecievedException;
+import com.example.tradestore.service.exceptions.TradeWithPastMaturityDateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +65,7 @@ class TradestoreApplicationTests {
 				.expired(false)
 				.build();
 
-		assertThrows(RuntimeException.class, ()->tradeService.saveTrade(t2)); // trying to create T1 with version 1 while version 2 is already present
+		assertThrows(StaleTradeRecievedException.class, ()->tradeService.saveTrade(t2)); // trying to create T1 with version 1 while version 2 is already present
 
 	}
 
@@ -115,7 +117,7 @@ class TradestoreApplicationTests {
 				.expired(false)
 				.build();
 
-		assertThrows(RuntimeException.class, ()->tradeService.saveTrade(t1)); // trade created with past maturity date
+		assertThrows(TradeWithPastMaturityDateException.class, ()->tradeService.saveTrade(t1)); // trade created with past maturity date
 	}
 
 	@Test
